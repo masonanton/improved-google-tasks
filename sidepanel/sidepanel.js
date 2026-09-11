@@ -1,6 +1,6 @@
 import { getAuthToken, signOut } from "../lib/auth.js";
 import { listAllTasks, patchTask } from "../lib/tasksApi.js";
-import { daysUntilDue, severityForTask } from "../lib/severity.js";
+import { daysUntilDue, dueDateColor } from "../lib/severity.js";
 import { parseNotes, serializeNotes } from "../lib/notesEncoding.js";
 
 const el = {
@@ -156,9 +156,16 @@ function renderTaskRow(task, tasklistId, { listTitle } = {}) {
   const input = row.querySelector(".progress-input");
   const notesTextEl = row.querySelector(".task-notes-text");
 
-  li.classList.add(severityForTask(task));
   row.querySelector(".task-title").textContent = task.title || "(untitled)";
-  row.querySelector(".task-due").textContent = formatDue(task.due);
+  const dueEl = row.querySelector(".task-due");
+  dueEl.textContent = formatDue(task.due);
+  const dotEl = row.querySelector(".severity-dot");
+  const color = dueDateColor(task.due);
+  if (color) {
+    dotEl.style.background = color;
+    dueEl.style.color = color;
+    dueEl.style.fontWeight = "600";
+  }
   if (listTitle) {
     row.querySelector(".task-list-badge").textContent = listTitle;
   }

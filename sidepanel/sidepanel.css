@@ -156,20 +156,6 @@ button:hover {
   display: none;
 }
 
-.task-row.overdue .task-due {
-  color: #d93025;
-  font-weight: 600;
-}
-
-.task-row.urgent .task-due {
-  color: #e8710a;
-  font-weight: 600;
-}
-
-.task-row.soon .task-due {
-  color: #b06000;
-}
-
 .progress-track {
   margin-top: 6px;
   height: 6px;

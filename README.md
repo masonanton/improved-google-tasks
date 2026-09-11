@@ -45,6 +45,7 @@ It works via Google's official Tasks API, shown in the extension's own side pane
   - Fires a desktop notification the first time a task crosses into "due soon" (≤3 days), "due today", or "overdue" — won't re-notify repeatedly for the same tier.
 - Progress bars: every task shows a completion-% bar under its title. Click a task to expand it and drag the slider to update progress — it's saved to the task's real Notes field (as a hidden `⟦gtx:...⟧` tag, your own note text is preserved and shown separately) via the Tasks API, so it syncs like any other edit.
 - In Progress list: a pinned section at the top of the panel automatically lists any task with progress set between 1–99%, regardless of which list it lives in (each row shows a small badge naming its origin list). It disappears once nothing qualifies, and a task still also appears in its normal list section below.
+- Due-date colors: the dot and due-date label on every task smoothly shift color — soft yellow at 7 days out, through amber and orange, to red at due-today, deepening further into dark maroon the longer it's overdue (capped at a week overdue). Tasks due further than 7 days out (or with no due date) stay neutral gray.
 
 ## Manual test checklist
 - [ ] Side panel opens from the toolbar icon and shows a working sign-in button when signed out.
@@ -61,3 +62,5 @@ It works via Google's official Tasks API, shown in the extension's own side pane
 - [ ] Setting a task's progress to anything between 1–99% makes it appear in the pinned **In Progress** section at the top, with a small badge naming its list.
 - [ ] Setting progress back to 0% or up to 100% and reloading the panel removes it from the In Progress section.
 - [ ] The In Progress section stays hidden when no task currently qualifies.
+- [ ] A task due in 7 days shows a subtle soft-yellow dot/label; as its due date gets closer the color visibly deepens toward orange, then red on the due date, then darkens further the longer it's overdue.
+- [ ] A task due more than 7 days out (or with no due date) shows the neutral gray dot with no colored label.
