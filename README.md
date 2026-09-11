@@ -3,7 +3,7 @@
 A Chrome extension that adds to Google Tasks:
 1. **Progress bars** — track a completion % per task (Phase 2, built)
 2. **Deadline countdowns** — escalating badge + desktop notification alerts as due dates approach (Phase 1, built)
-3. **In-progress list** — a cross-list view of tasks you've flagged as active (coming in Phase 3)
+3. **In-progress list** — a pinned view aggregating every task that has progress > 0% and < 100%, across all your lists (Phase 3, built)
 
 It works via Google's official Tasks API, shown in the extension's own side panel — not by modifying Google's actual Tasks page (see the plan/context for why).
 
@@ -44,8 +44,7 @@ It works via Google's official Tasks API, shown in the extension's own side pane
   - Sets the toolbar badge color to the worst current due-date severity.
   - Fires a desktop notification the first time a task crosses into "due soon" (≤3 days), "due today", or "overdue" — won't re-notify repeatedly for the same tier.
 - Progress bars: every task shows a completion-% bar under its title. Click a task to expand it and drag the slider to update progress — it's saved to the task's real Notes field (as a hidden `⟦gtx:...⟧` tag, your own note text is preserved and shown separately) via the Tasks API, so it syncs like any other edit.
-
-Not built yet: the in-progress list (Phase 3).
+- In Progress list: a pinned section at the top of the panel automatically lists any task with progress set between 1–99%, regardless of which list it lives in (each row shows a small badge naming its origin list). It disappears once nothing qualifies, and a task still also appears in its normal list section below.
 
 ## Manual test checklist
 - [ ] Side panel opens from the toolbar icon and shows a working sign-in button when signed out.
@@ -59,3 +58,6 @@ Not built yet: the in-progress list (Phase 3).
 - [ ] Dragging the slider and releasing it updates the bar immediately and saves — refresh the panel (or reload) to confirm it persisted.
 - [ ] Open the same task in the real Google Tasks web app / mobile app — its Notes field should contain your original note text (if any) plus a `⟦gtx:p=NN...⟧` tag at the end.
 - [ ] Editing that task's notes text directly in Google Tasks (leaving the tag alone) and reloading the extension panel should still show the correct progress and the edited note text.
+- [ ] Setting a task's progress to anything between 1–99% makes it appear in the pinned **In Progress** section at the top, with a small badge naming its list.
+- [ ] Setting progress back to 0% or up to 100% and reloading the panel removes it from the In Progress section.
+- [ ] The In Progress section stays hidden when no task currently qualifies.

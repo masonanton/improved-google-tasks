@@ -21,7 +21,13 @@
 
   <div id="status" role="status"></div>
 
-  <main id="lists-view" hidden></main>
+  <main id="lists-view" hidden>
+    <section id="in-progress-section" class="tasklist in-progress-section" hidden>
+      <h2 class="tasklist-title">In Progress</h2>
+      <ul class="task-rows" id="in-progress-rows"></ul>
+    </section>
+    <div id="per-list-sections"></div>
+  </main>
 
   <template id="list-template">
     <section class="tasklist">
@@ -35,6 +41,7 @@
       <button type="button" class="task-main">
         <span class="severity-dot"></span>
         <span class="task-title"></span>
+        <span class="task-list-badge"></span>
         <span class="task-due"></span>
       </button>
       <div class="progress-track" title="">

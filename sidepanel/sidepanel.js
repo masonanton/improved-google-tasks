@@ -10,6 +10,9 @@ const el = {
   refreshBtn: document.getElementById("refresh-btn"),
   status: document.getElementById("status"),
   listsView: document.getElementById("lists-view"),
+  perListSections: document.getElementById("per-list-sections"),
+  inProgressSection: document.getElementById("in-progress-section"),
+  inProgressRows: document.getElementById("in-progress-rows"),
   listTemplate: document.getElementById("list-template"),
   taskRowTemplate: document.getElementById("task-row-template"),
 };
@@ -45,7 +48,9 @@ async function handleSignIn() {
 async function handleSignOut() {
   await signOut();
   showSignedOut();
-  el.listsView.innerHTML = "";
+  el.perListSections.innerHTML = "";
+  el.inProgressRows.innerHTML = "";
+  el.inProgressSection.hidden = true;
   setStatus("");
 }
 
@@ -69,13 +74,39 @@ function setStatus(text) {
 
 async function loadTasks() {
   setStatus("Loading tasks...");
-  el.listsView.innerHTML = "";
+  el.perListSections.innerHTML = "";
+  el.inProgressRows.innerHTML = "";
+  el.inProgressSection.hidden = true;
   try {
     const lists = await listAllTasks({ showCompleted: false });
+    renderInProgress(lists);
     renderLists(lists);
     setStatus("");
   } catch (err) {
     setStatus(`Couldn't load tasks: ${err.message}`);
+  }
+}
+
+// Any task with a progress value between 1-99% is "in progress" — this
+// aggregates them across every list into one pinned view at the top,
+// regardless of which list they actually live in.
+function renderInProgress(lists) {
+  const inProgress = lists.flatMap(({ list, tasks }) =>
+    tasks
+      .filter((task) => {
+        const { progress } = parseNotes(task.notes);
+        return progress !== null && progress > 0 && progress < 100;
+      })
+      .map((task) => ({ task, tasklistId: list.id, listTitle: list.title }))
+  );
+
+  if (inProgress.length === 0) return;
+
+  inProgress.sort((a, b) => compareDue(a.task.due, b.task.due));
+
+  el.inProgressSection.hidden = false;
+  for (const { task, tasklistId, listTitle } of inProgress) {
+    el.inProgressRows.appendChild(renderTaskRow(task, tasklistId, { listTitle }));
   }
 }
 
@@ -86,7 +117,7 @@ function renderLists(lists) {
     const empty = document.createElement("p");
     empty.className = "empty-state";
     empty.textContent = "No open tasks — you're all caught up.";
-    el.listsView.appendChild(empty);
+    el.perListSections.appendChild(empty);
     return;
   }
 
@@ -99,20 +130,22 @@ function renderLists(lists) {
       rowsEl.appendChild(renderTaskRow(task, list.id));
     }
 
-    el.listsView.appendChild(section);
+    el.perListSections.appendChild(section);
   }
 }
 
 function sortByDueDate(tasks) {
-  return [...tasks].sort((a, b) => {
-    if (!a.due && !b.due) return 0;
-    if (!a.due) return 1;
-    if (!b.due) return -1;
-    return new Date(a.due) - new Date(b.due);
-  });
+  return [...tasks].sort((a, b) => compareDue(a.due, b.due));
 }
 
-function renderTaskRow(task, tasklistId) {
+function compareDue(dueA, dueB) {
+  if (!dueA && !dueB) return 0;
+  if (!dueA) return 1;
+  if (!dueB) return -1;
+  return new Date(dueA) - new Date(dueB);
+}
+
+function renderTaskRow(task, tasklistId, { listTitle } = {}) {
   const row = el.taskRowTemplate.content.cloneNode(true);
   const li = row.querySelector(".task-row");
   const mainBtn = row.querySelector(".task-main");
@@ -126,10 +159,13 @@ function renderTaskRow(task, tasklistId) {
   li.classList.add(severityForTask(task));
   row.querySelector(".task-title").textContent = task.title || "(untitled)";
   row.querySelector(".task-due").textContent = formatDue(task.due);
+  if (listTitle) {
+    row.querySelector(".task-list-badge").textContent = listTitle;
+  }
 
   const parsed = parseNotes(task.notes);
   let currentProgress = parsed.progress ?? 0;
-  const currentStatus = parsed.status; // preserved as-is; Phase 3 will read/write this
+  const currentStatus = parsed.status; // unused for now, preserved so we never clobber it
   notesTextEl.textContent = parsed.text.trim();
 
   const progressEls = { li, fill, track, valueEl, input };
