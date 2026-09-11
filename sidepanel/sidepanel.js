@@ -1,6 +1,7 @@
 import { getAuthToken, signOut } from "../lib/auth.js";
-import { listAllTasks } from "../lib/tasksApi.js";
+import { listAllTasks, patchTask } from "../lib/tasksApi.js";
 import { daysUntilDue, severityForTask } from "../lib/severity.js";
+import { parseNotes, serializeNotes } from "../lib/notesEncoding.js";
 
 const el = {
   signinView: document.getElementById("signin-view"),
@@ -95,7 +96,7 @@ function renderLists(lists) {
     const rowsEl = section.querySelector(".task-rows");
 
     for (const task of sortByDueDate(tasks)) {
-      rowsEl.appendChild(renderTaskRow(task));
+      rowsEl.appendChild(renderTaskRow(task, list.id));
     }
 
     el.listsView.appendChild(section);
@@ -111,16 +112,62 @@ function sortByDueDate(tasks) {
   });
 }
 
-function renderTaskRow(task) {
+function renderTaskRow(task, tasklistId) {
   const row = el.taskRowTemplate.content.cloneNode(true);
   const li = row.querySelector(".task-row");
-  const severity = severityForTask(task);
+  const mainBtn = row.querySelector(".task-main");
+  const detail = row.querySelector(".task-detail");
+  const fill = row.querySelector(".progress-fill");
+  const track = row.querySelector(".progress-track");
+  const valueEl = row.querySelector(".progress-value");
+  const input = row.querySelector(".progress-input");
+  const notesTextEl = row.querySelector(".task-notes-text");
 
-  li.classList.add(severity);
+  li.classList.add(severityForTask(task));
   row.querySelector(".task-title").textContent = task.title || "(untitled)";
   row.querySelector(".task-due").textContent = formatDue(task.due);
 
+  const parsed = parseNotes(task.notes);
+  let currentProgress = parsed.progress ?? 0;
+  const currentStatus = parsed.status; // preserved as-is; Phase 3 will read/write this
+  notesTextEl.textContent = parsed.text.trim();
+
+  const progressEls = { li, fill, track, valueEl, input };
+  setProgressUI(progressEls, currentProgress);
+
+  mainBtn.addEventListener("click", () => {
+    detail.hidden = !detail.hidden;
+  });
+
+  input.addEventListener("change", async () => {
+    const newProgress = Number(input.value);
+    const previousProgress = currentProgress;
+    setProgressUI(progressEls, newProgress); // optimistic update
+
+    try {
+      const newNotes = serializeNotes({
+        text: parsed.text,
+        progress: newProgress,
+        status: currentStatus,
+      });
+      await patchTask(tasklistId, task.id, { notes: newNotes });
+      task.notes = newNotes;
+      currentProgress = newProgress;
+    } catch (err) {
+      setProgressUI(progressEls, previousProgress); // revert on failure
+      setStatus(`Couldn't update progress: ${err.message}`);
+    }
+  });
+
   return row;
+}
+
+function setProgressUI({ li, fill, track, valueEl, input }, progress) {
+  fill.style.width = `${progress}%`;
+  valueEl.textContent = progress;
+  input.value = progress;
+  track.title = `${progress}% complete`;
+  li.classList.toggle("progress-complete", progress >= 100);
 }
 
 function formatDue(dueIso) {

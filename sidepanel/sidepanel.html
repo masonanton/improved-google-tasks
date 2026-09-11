@@ -32,10 +32,20 @@
 
   <template id="task-row-template">
     <li class="task-row">
-      <div class="task-main">
+      <button type="button" class="task-main">
         <span class="severity-dot"></span>
         <span class="task-title"></span>
         <span class="task-due"></span>
+      </button>
+      <div class="progress-track" title="">
+        <div class="progress-fill"></div>
+      </div>
+      <div class="task-detail" hidden>
+        <label class="progress-label">
+          Progress: <span class="progress-value"></span>%
+          <input type="range" class="progress-input" min="0" max="100" step="5" />
+        </label>
+        <p class="task-notes-text"></p>
       </div>
     </li>
   </template>
