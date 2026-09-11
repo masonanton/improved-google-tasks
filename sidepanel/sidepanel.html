@@ -21,6 +21,13 @@
 
   <div id="status" role="status"></div>
 
+  <form id="add-task-form" hidden>
+    <select id="add-task-list" aria-label="List to add to"></select>
+    <input type="text" id="add-task-title" placeholder="Add a task..." required />
+    <input type="date" id="add-task-due" aria-label="Due date (optional)" />
+    <button type="submit">Add</button>
+  </form>
+
   <main id="lists-view" hidden>
     <section id="in-progress-section" class="tasklist in-progress-section" hidden>
       <h2 class="tasklist-title">In Progress</h2>
@@ -38,12 +45,15 @@
 
   <template id="task-row-template">
     <li class="task-row">
-      <button type="button" class="task-main">
-        <span class="severity-dot"></span>
-        <span class="task-title"></span>
-        <span class="task-list-badge"></span>
-        <span class="task-due"></span>
-      </button>
+      <div class="task-main">
+        <input type="checkbox" class="complete-checkbox" title="Mark complete" />
+        <span class="task-expand" role="button" tabindex="0">
+          <span class="severity-dot"></span>
+          <span class="task-title"></span>
+          <span class="task-list-badge"></span>
+          <span class="task-due"></span>
+        </span>
+      </div>
       <div class="progress-track" title="">
         <div class="progress-fill"></div>
       </div>

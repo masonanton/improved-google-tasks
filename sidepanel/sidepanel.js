@@ -1,5 +1,5 @@
 import { getAuthToken, signOut } from "../lib/auth.js";
-import { listAllTasks, patchTask } from "../lib/tasksApi.js";
+import { listAllTasks, patchTask, insertTask } from "../lib/tasksApi.js";
 import { daysUntilDue, dueDateColor } from "../lib/severity.js";
 import { parseNotes, serializeNotes } from "../lib/notesEncoding.js";
 
@@ -15,11 +15,16 @@ const el = {
   inProgressRows: document.getElementById("in-progress-rows"),
   listTemplate: document.getElementById("list-template"),
   taskRowTemplate: document.getElementById("task-row-template"),
+  addTaskForm: document.getElementById("add-task-form"),
+  addTaskList: document.getElementById("add-task-list"),
+  addTaskTitle: document.getElementById("add-task-title"),
+  addTaskDue: document.getElementById("add-task-due"),
 };
 
 el.signinBtn.addEventListener("click", () => handleSignIn());
 el.signoutBtn.addEventListener("click", () => handleSignOut());
 el.refreshBtn.addEventListener("click", () => loadTasks());
+el.addTaskForm.addEventListener("submit", handleAddTask);
 
 init();
 
@@ -59,6 +64,7 @@ function showSignedIn() {
   el.signoutBtn.hidden = false;
   el.refreshBtn.hidden = false;
   el.listsView.hidden = false;
+  el.addTaskForm.hidden = false;
 }
 
 function showSignedOut() {
@@ -66,6 +72,7 @@ function showSignedOut() {
   el.signoutBtn.hidden = true;
   el.refreshBtn.hidden = true;
   el.listsView.hidden = true;
+  el.addTaskForm.hidden = true;
 }
 
 function setStatus(text) {
@@ -79,11 +86,51 @@ async function loadTasks() {
   el.inProgressSection.hidden = true;
   try {
     const lists = await listAllTasks({ showCompleted: false });
+    populateListPicker(lists.map(({ list }) => list));
     renderInProgress(lists);
     renderLists(lists);
     setStatus("");
   } catch (err) {
     setStatus(`Couldn't load tasks: ${err.message}`);
+  }
+}
+
+function populateListPicker(lists) {
+  const previouslySelected = el.addTaskList.value;
+  el.addTaskList.innerHTML = "";
+  for (const list of lists) {
+    const option = document.createElement("option");
+    option.value = list.id;
+    option.textContent = list.title;
+    el.addTaskList.appendChild(option);
+  }
+  if (lists.some((list) => list.id === previouslySelected)) {
+    el.addTaskList.value = previouslySelected;
+  }
+}
+
+async function handleAddTask(event) {
+  event.preventDefault();
+  const title = el.addTaskTitle.value.trim();
+  const tasklistId = el.addTaskList.value;
+  if (!title || !tasklistId) return;
+
+  const body = { title };
+  if (el.addTaskDue.value) {
+    body.due = `${el.addTaskDue.value}T00:00:00.000Z`;
+  }
+
+  const submitBtn = el.addTaskForm.querySelector("button");
+  submitBtn.disabled = true;
+  try {
+    await insertTask(tasklistId, body);
+    el.addTaskTitle.value = "";
+    el.addTaskDue.value = "";
+    await loadTasks();
+  } catch (err) {
+    setStatus(`Couldn't add task: ${err.message}`);
+  } finally {
+    submitBtn.disabled = false;
   }
 }
 
@@ -148,7 +195,8 @@ function compareDue(dueA, dueB) {
 function renderTaskRow(task, tasklistId, { listTitle } = {}) {
   const row = el.taskRowTemplate.content.cloneNode(true);
   const li = row.querySelector(".task-row");
-  const mainBtn = row.querySelector(".task-main");
+  const expandEl = row.querySelector(".task-expand");
+  const checkbox = row.querySelector(".complete-checkbox");
   const detail = row.querySelector(".task-detail");
   const fill = row.querySelector(".progress-fill");
   const track = row.querySelector(".progress-track");
@@ -178,8 +226,29 @@ function renderTaskRow(task, tasklistId, { listTitle } = {}) {
   const progressEls = { li, fill, track, valueEl, input };
   setProgressUI(progressEls, currentProgress);
 
-  mainBtn.addEventListener("click", () => {
+  expandEl.addEventListener("click", () => {
     detail.hidden = !detail.hidden;
+  });
+  expandEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      detail.hidden = !detail.hidden;
+    }
+  });
+
+  checkbox.addEventListener("change", async () => {
+    checkbox.disabled = true;
+    try {
+      await patchTask(tasklistId, task.id, {
+        status: "completed",
+        completed: new Date().toISOString(),
+      });
+      li.remove();
+    } catch (err) {
+      checkbox.checked = false;
+      checkbox.disabled = false;
+      setStatus(`Couldn't mark task complete: ${err.message}`);
+    }
   });
 
   input.addEventListener("change", async () => {
