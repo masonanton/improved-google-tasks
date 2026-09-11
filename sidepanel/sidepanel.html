@@ -9,9 +9,17 @@
   <header>
     <h1>Improved Google Tasks</h1>
     <div class="header-actions">
+      <button id="add-task-toggle" title="Add task" hidden>+</button>
       <button id="refresh-btn" title="Refresh" hidden>&#8635;</button>
       <button id="signout-btn" hidden>Sign out</button>
     </div>
+
+    <form id="add-task-form" hidden>
+      <select id="add-task-list" aria-label="List to add to"></select>
+      <input type="text" id="add-task-title" placeholder="Add a task..." required />
+      <input type="date" id="add-task-due" aria-label="Due date (optional)" />
+      <button type="submit">Add</button>
+    </form>
   </header>
 
   <div id="signin-view">
@@ -20,13 +28,6 @@
   </div>
 
   <div id="status" role="status"></div>
-
-  <form id="add-task-form" hidden>
-    <select id="add-task-list" aria-label="List to add to"></select>
-    <input type="text" id="add-task-title" placeholder="Add a task..." required />
-    <input type="date" id="add-task-due" aria-label="Due date (optional)" />
-    <button type="submit">Add</button>
-  </form>
 
   <main id="lists-view" hidden>
     <section id="in-progress-section" class="tasklist in-progress-section" hidden>

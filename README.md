@@ -45,7 +45,7 @@ It works via Google's official Tasks API, shown in the extension's own side pane
 - In Progress list: a pinned section at the top of the panel automatically lists any task with progress set between 1–99%, regardless of which list it lives in (each row shows a small badge naming its origin list). It disappears once nothing qualifies, and a task still also appears in its normal list section below.
 - Due-date colors: the dot and due-date label on every task smoothly shift color — soft yellow at 7 days out, through amber and orange, to red at due-today, deepening further into dark maroon the longer it's overdue (capped at a week overdue). Tasks due further than 7 days out (or with no due date) stay neutral gray.
 - Mark complete: each task row has a checkbox — checking it marks the task complete in Google Tasks and removes it from the panel immediately.
-- Add task: a bar above the task lists lets you pick a target list, type a title, optionally set a due date, and add it — it's created via the real Tasks API and shows up in the right place right away.
+- Add task: a **+** button in the header opens a small dropdown (pick a target list, type a title, optionally set a due date) instead of a bar that's always taking up space. It closes on submit, Escape, or clicking outside it.
 
 ## Manual test checklist
 - [ ] Side panel opens from the toolbar icon and shows a working sign-in button when signed out.
@@ -65,4 +65,5 @@ It works via Google's official Tasks API, shown in the extension's own side pane
 - [ ] A task due in 7 days shows a subtle soft-yellow dot/label; as its due date gets closer the color visibly deepens toward orange, then red on the due date, then darkens further the longer it's overdue.
 - [ ] A task due more than 7 days out (or with no due date) shows the neutral gray dot with no colored label.
 - [ ] Checking a task's checkbox marks it complete — it disappears from the panel, and shows as completed/checked off in the real Google Tasks app.
-- [ ] Using the "Add a task..." bar (pick a list, type a title, optionally a due date, click Add) creates a real task — it appears in the panel and in the real Google Tasks app under the chosen list.
+- [ ] Clicking the **+** button in the header opens the add-task dropdown; clicking it again, pressing Escape, or clicking elsewhere in the panel closes it without adding anything.
+- [ ] Filling in the dropdown (pick a list, type a title, optionally a due date) and clicking Add creates a real task, closes the dropdown, and the task appears in the panel and in the real Google Tasks app under the chosen list.

@@ -15,6 +15,7 @@ const el = {
   inProgressRows: document.getElementById("in-progress-rows"),
   listTemplate: document.getElementById("list-template"),
   taskRowTemplate: document.getElementById("task-row-template"),
+  addTaskToggle: document.getElementById("add-task-toggle"),
   addTaskForm: document.getElementById("add-task-form"),
   addTaskList: document.getElementById("add-task-list"),
   addTaskTitle: document.getElementById("add-task-title"),
@@ -24,7 +25,18 @@ const el = {
 el.signinBtn.addEventListener("click", () => handleSignIn());
 el.signoutBtn.addEventListener("click", () => handleSignOut());
 el.refreshBtn.addEventListener("click", () => loadTasks());
+el.addTaskToggle.addEventListener("click", () => toggleAddTaskForm());
 el.addTaskForm.addEventListener("submit", handleAddTask);
+
+document.addEventListener("click", (e) => {
+  if (el.addTaskForm.hidden) return;
+  if (el.addTaskForm.contains(e.target) || el.addTaskToggle.contains(e.target)) return;
+  closeAddTaskForm();
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !el.addTaskForm.hidden) closeAddTaskForm();
+});
 
 init();
 
@@ -63,15 +75,29 @@ function showSignedIn() {
   el.signinView.hidden = true;
   el.signoutBtn.hidden = false;
   el.refreshBtn.hidden = false;
+  el.addTaskToggle.hidden = false;
   el.listsView.hidden = false;
-  el.addTaskForm.hidden = false;
 }
 
 function showSignedOut() {
   el.signinView.hidden = false;
   el.signoutBtn.hidden = true;
   el.refreshBtn.hidden = true;
+  el.addTaskToggle.hidden = true;
   el.listsView.hidden = true;
+  closeAddTaskForm();
+}
+
+function toggleAddTaskForm() {
+  if (el.addTaskForm.hidden) {
+    el.addTaskForm.hidden = false;
+    el.addTaskTitle.focus();
+  } else {
+    closeAddTaskForm();
+  }
+}
+
+function closeAddTaskForm() {
   el.addTaskForm.hidden = true;
 }
 
@@ -126,6 +152,7 @@ async function handleAddTask(event) {
     await insertTask(tasklistId, body);
     el.addTaskTitle.value = "";
     el.addTaskDue.value = "";
+    closeAddTaskForm();
     await loadTasks();
   } catch (err) {
     setStatus(`Couldn't add task: ${err.message}`);
