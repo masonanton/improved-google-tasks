@@ -1,5 +1,5 @@
 import { listAllTasks } from "./lib/tasksApi.js";
-import { severityForTask, worstSeverity, SEVERITY, SEVERITY_COLOR } from "./lib/severity.js";
+import { severityForTask, SEVERITY } from "./lib/severity.js";
 
 const ALARM_NAME = "due-date-check";
 const CHECK_INTERVAL_MINUTES = 15;
@@ -24,6 +24,9 @@ const NOTIFICATION_COPY = {
 };
 
 chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
+
+// No toolbar badge is used — clear any left over from a previous version.
+chrome.action.setBadgeText({ text: "" }).catch(() => {});
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.alarms.create(ALARM_NAME, { periodInMinutes: CHECK_INTERVAL_MINUTES, delayInMinutes: 0 });
@@ -56,17 +59,7 @@ async function checkDueDates() {
     severityByTaskId.set(task.id, severityForTask(task, now));
   }
 
-  await updateBadge(worstSeverity([...severityByTaskId.values()]));
   await notifyNewlyEscalated(allTasks, severityByTaskId);
-}
-
-async function updateBadge(worst) {
-  if (worst === SEVERITY.NONE) {
-    await chrome.action.setBadgeText({ text: "" });
-    return;
-  }
-  await chrome.action.setBadgeBackgroundColor({ color: SEVERITY_COLOR[worst] });
-  await chrome.action.setBadgeText({ text: "!" });
 }
 
 async function notifyNewlyEscalated(tasks, severityByTaskId) {

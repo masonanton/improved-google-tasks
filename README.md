@@ -2,7 +2,7 @@
 
 A Chrome extension that adds to Google Tasks:
 1. **Progress bars** — track a completion % per task (Phase 2, built)
-2. **Deadline countdowns** — escalating badge + desktop notification alerts as due dates approach (Phase 1, built)
+2. **Deadline countdowns** — escalating desktop notification alerts as due dates approach (Phase 1, built)
 3. **In-progress list** — a pinned view aggregating every task that has progress > 0% and < 100%, across all your lists (Phase 3, built)
 
 It works via Google's official Tasks API, shown in the extension's own side panel — not by modifying Google's actual Tasks page (see the plan/context for why).
@@ -40,9 +40,7 @@ It works via Google's official Tasks API, shown in the extension's own side pane
 ## What's built so far (Phase 0, 1 & 2)
 - Auth + Tasks API plumbing (`lib/auth.js`, `lib/tasksApi.js`).
 - Side panel listing all your task lists and open tasks, color-coded by how close each is to its due date.
-- Background alarm (every 15 min) that:
-  - Sets the toolbar badge color to the worst current due-date severity.
-  - Fires a desktop notification the first time a task crosses into "due soon" (≤3 days), "due today", or "overdue" — won't re-notify repeatedly for the same tier.
+- Background alarm (every 15 min) that fires a desktop notification the first time a task crosses into "due soon" (≤3 days), "due today", or "overdue" — won't re-notify repeatedly for the same tier. There's no toolbar badge; alerts are notification-only.
 - Progress bars: every task shows a completion-% bar under its title. Click a task to expand it and drag the slider to update progress — it's saved to the task's real Notes field (as a hidden `⟦gtx:...⟧` tag, your own note text is preserved and shown separately) via the Tasks API, so it syncs like any other edit.
 - In Progress list: a pinned section at the top of the panel automatically lists any task with progress set between 1–99%, regardless of which list it lives in (each row shows a small badge naming its origin list). It disappears once nothing qualifies, and a task still also appears in its normal list section below.
 - Due-date colors: the dot and due-date label on every task smoothly shift color — soft yellow at 7 days out, through amber and orange, to red at due-today, deepening further into dark maroon the longer it's overdue (capped at a week overdue). Tasks due further than 7 days out (or with no due date) stay neutral gray.
@@ -53,7 +51,7 @@ It works via Google's official Tasks API, shown in the extension's own side pane
 - [ ] Side panel opens from the toolbar icon and shows a working sign-in button when signed out.
 - [ ] After sign-in, your real task lists and open tasks appear, matching tasks.google.com.
 - [ ] A task due within 3 days shows a yellow "Due in N days" label; due today shows orange "Due today"; a past-due task shows red "Overdue by N days".
-- [ ] Temporarily set a test task's due date to today (or move it to the past) in Google Tasks, then wait for the next alarm tick (or reload the extension to trigger an immediate check) — a desktop notification should appear once, and the toolbar badge should turn colored.
+- [ ] Temporarily set a test task's due date to today (or move it to the past) in Google Tasks, then wait for the next alarm tick (or reload the extension to trigger an immediate check) — a desktop notification should appear once, with no toolbar badge.
 - [ ] Reloading again without the due date changing further should **not** produce a duplicate notification for the same task/tier.
 - [ ] **Sign out** clears the panel and returns to the sign-in screen.
 - [ ] Every task row shows a thin progress bar under its title (0% width if untouched).
