@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Improved Google Tasks</title>
+  <link rel="stylesheet" href="sidepanel.css" />
+</head>
+<body>
+  <header>
+    <h1>Improved Google Tasks</h1>
+    <div class="header-actions">
+      <button id="refresh-btn" title="Refresh" hidden>&#8635;</button>
+      <button id="signout-btn" hidden>Sign out</button>
+    </div>
+  </header>
+
+  <div id="signin-view">
+    <p>Sign in with Google to load your tasks.</p>
+    <button id="signin-btn">Sign in with Google</button>
+  </div>
+
+  <div id="status" role="status"></div>
+
+  <main id="lists-view" hidden></main>
+
+  <template id="list-template">
+    <section class="tasklist">
+      <h2 class="tasklist-title"></h2>
+      <ul class="task-rows"></ul>
+    </section>
+  </template>
+
+  <template id="task-row-template">
+    <li class="task-row">
+      <div class="task-main">
+        <span class="severity-dot"></span>
+        <span class="task-title"></span>
+        <span class="task-due"></span>
+      </div>
+    </li>
+  </template>
+
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>

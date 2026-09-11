@@ -1,0 +1,149 @@
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --fg: #202124;
+  --muted: #5f6368;
+  --border: #e0e0e0;
+  --accent: #1a73e8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #202124;
+    --fg: #e8eaed;
+    --muted: #9aa0a6;
+    --border: #3c4043;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+h1 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+button {
+  font: inherit;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg);
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: rgba(128, 128, 128, 0.1);
+}
+
+#signin-view {
+  padding: 24px 16px;
+  text-align: center;
+}
+
+#signin-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+}
+
+#status {
+  padding: 4px 16px;
+  color: var(--muted);
+  min-height: 1em;
+}
+
+.tasklist {
+  padding: 8px 16px;
+}
+
+.tasklist-title {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  margin: 12px 0 4px;
+}
+
+.task-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.task-row {
+  border-bottom: 1px solid var(--border);
+  padding: 8px 4px;
+}
+
+.task-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.severity-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--muted);
+}
+
+.task-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-due {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.task-row.overdue .task-due {
+  color: #d93025;
+  font-weight: 600;
+}
+
+.task-row.urgent .task-due {
+  color: #e8710a;
+  font-weight: 600;
+}
+
+.task-row.soon .task-due {
+  color: #b06000;
+}
+
+.empty-state {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--muted);
+}
