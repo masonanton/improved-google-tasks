@@ -86,6 +86,10 @@ button:hover {
   border-color: var(--accent);
 }
 
+#add-task-form[hidden] {
+  display: none;
+}
+
 #add-task-form {
   position: absolute;
   top: calc(100% + 4px);
